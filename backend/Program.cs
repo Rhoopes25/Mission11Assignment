@@ -1,23 +1,53 @@
+// These "using" statements import the namespaces we need
+// Like import statements in React/TypeScript
+using Bookstore.API.Data;
+using Microsoft.EntityFrameworkCore;
+
+// Creates the app builder - this is the starting point for every ASP.NET app
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// Tells the app we're using controllers 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 
+// These two lines enable Swagger - a built-in tool to test your API in the browser
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Registers the database context with dependency injection
+// It reads the connection string "BookstoreConnection" from appsettings.json
+// This is what makes _context available in our controller later
+builder.Services.AddDbContext<BookstoreDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("BookstoreConnection")));
+
+// Sets up CORS (Cross-Origin Resource Sharing)
+// Without this, the browser blocks React from talking to the backend
+// because they run on different ports (3000 vs 5000)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact", policy =>
+        policy.WithOrigins("http://localhost:3000") // only allow requests from React's port
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
+// Builds the actual app from all the services we registered above
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Only show Swagger in development mode, not in production
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// Activates the CORS policy we defined above
+app.UseCors("AllowReact");
 
+// Enables authorization (we're not using login/auth but it's good practice to include)
 app.UseAuthorization();
 
+// Tells the app to route incoming requests to the right controller
 app.MapControllers();
 
+// Starts the server and keeps it running
 app.Run();
