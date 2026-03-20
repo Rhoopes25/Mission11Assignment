@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bookstore.API.Data;
 
+// this will set up DB and has to match the sqlite file exactly
 public class Book
 {
     [Key]
