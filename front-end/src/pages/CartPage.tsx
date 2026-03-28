@@ -2,8 +2,8 @@ import { useCart } from '../context/CartContext'; // access the cart
 import { useNavigate } from 'react-router-dom'; // for continue shopping button
 
 function CartPage() {
-  const { cart, removeFromCart, clearCart } = useCart(); // pull cart data and functions
-  const navigate = useNavigate(); // for navigation
+  const { cart, removeFromCart, clearCart, updateQuantity } = useCart(); // pull cart data and functions
+  const navigate = useNavigate();
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0); // calculate grand total
 
@@ -12,7 +12,6 @@ function CartPage() {
       <h1 className="mb-4">🛒 Your Cart</h1>
 
       {cart.length === 0 ? (
-        // show this if cart is empty
         <p className="text-muted">Your cart is empty!</p>
       ) : (
         <>
@@ -31,12 +30,31 @@ function CartPage() {
                 <tr key={item.bookID}>
                   <td>{item.title}</td>
                   <td>${item.price.toFixed(2)}</td>
-                  <td>{item.quantity}</td>
-                  <td>${(item.price * item.quantity).toFixed(2)}</td> {/* subtotal per item */}
+                  <td>
+                    {/* quantity - and + buttons */}
+                    <div className="d-flex align-items-center gap-2">
+                      <button
+                        className="btn btn-outline-secondary btn-sm"
+                        onClick={() => {
+                          if (item.quantity === 1) {
+                            removeFromCart(item.bookID); // remove if quantity hits 0
+                          } else {
+                            updateQuantity(item.bookID, item.quantity - 1); // decrease by 1
+                          }
+                        }}
+                      >-</button>
+                      <span>{item.quantity}</span>
+                      <button
+                        className="btn btn-outline-secondary btn-sm"
+                        onClick={() => updateQuantity(item.bookID, item.quantity + 1)} // increase by 1
+                      >+</button>
+                    </div>
+                  </td>
+                  <td>${(item.price * item.quantity).toFixed(2)}</td> {/* subtotal */}
                   <td>
                     <button
                       className="btn btn-danger btn-sm"
-                      onClick={() => removeFromCart(item.bookID)} // remove this item
+                      onClick={() => removeFromCart(item.bookID)} // remove whole item
                     >
                       Remove
                     </button>
@@ -46,14 +64,14 @@ function CartPage() {
             </tbody>
           </table>
 
-          {/* total and actions */}
+          {/* total and action buttons */}
           <div className="d-flex justify-content-between align-items-center mt-3">
             <h4>Total: ${total.toFixed(2)}</h4>
             <div className="d-flex gap-2">
-              <button className="btn btn-outline-secondary" onClick={() => navigate('/')}> {/* go back to book list */}
+              <button className="btn btn-primary" onClick={() => navigate('/')}> {/* blue to stand out */}
                 Continue Shopping
               </button>
-              <button className="btn btn-danger" onClick={clearCart}> {/* empty the cart */}
+              <button className="btn btn-danger" onClick={clearCart}>
                 Clear Cart
               </button>
             </div>

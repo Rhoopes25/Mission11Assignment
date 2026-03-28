@@ -10,11 +10,12 @@ export interface CartItem {
 
 // defines what the cart context provides to the rest of the app
 interface CartContextType {
-  cart: CartItem[];
-  addToCart: (item: CartItem) => void;
-  removeFromCart: (bookID: number) => void;
-  clearCart: () => void;
-}
+    cart: CartItem[];
+    addToCart: (item: CartItem) => void;
+    removeFromCart: (bookID: number) => void;
+    clearCart: () => void;
+    updateQuantity: (bookID: number, quantity: number) => void; // update quantity of an item
+  }
 
 // create the context - starts as undefined until the provider wraps the app
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -42,9 +43,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const clearCart = () => setCart([]); // reset cart to empty
+  const updateQuantity = (bookID: number, quantity: number) => {
+    setCart((prevCart) =>
+      prevCart.map((c) =>
+        c.bookID === bookID ? { ...c, quantity } : c // update quantity for matching item
+      )
+    );
+  };
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart, updateQuantity }}>
       {children}
     </CartContext.Provider>
   );

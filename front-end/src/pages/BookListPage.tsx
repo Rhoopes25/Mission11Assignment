@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { Book } from '../types/book';
 import { useCart } from '../context/CartContext'; // gives us access to the cart
-import { useNavigate } from 'react-router-dom'; // lets us navigate to cart page
+import { useNavigate } from 'react-router-dom'; // for navigating to cart with state
+
 
 function BookListPage() {
   const [books, setBooks] = useState<Book[]>([]); // books from the API
@@ -13,7 +14,8 @@ function BookListPage() {
   const [categories, setCategories] = useState<string[]>([]); // all categories for dropdown
   const [selectedCategory, setSelectedCategory] = useState<string>(''); // selected category
   const { addToCart } = useCart(); // pull addToCart from cart context
-  const navigate = useNavigate(); // for navigating to cart page
+  const navigate = useNavigate();
+
 
   // fetch categories once on load
   useEffect(() => {
@@ -115,7 +117,7 @@ function BookListPage() {
                   className="btn btn-primary btn-sm mt-2 w-100"
                   onClick={() => {
                     addToCart({ bookID: book.bookID, title: book.title, price: book.price, quantity: 1 }); // add to cart
-                    navigate('/cart'); // go to cart page
+                    navigate('/cart', { state: { pageNum, selectedCategory } }); // pass current page and category to cart
                   }}
                 >
                   Add to Cart
