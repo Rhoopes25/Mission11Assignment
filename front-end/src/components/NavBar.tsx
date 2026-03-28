@@ -16,8 +16,9 @@ function NavBar({ pageNum, selectedCategory, pageSize }: NavBarProps) {
 
   return (
     <nav className="navbar navbar-dark bg-dark px-4 mb-4"> {/* bootstrap navbar */}
-      <span className="navbar-brand">📚 Bookstore</span> {/* app name on left */}
-      <button
+<span className="navbar-brand" style={{ color: "white" }}>
+  Bookstore
+</span>      <button
         className="btn btn-outline-light d-flex align-items-center gap-2"
         onClick={() => navigate('/cart', { state: { pageNum, selectedCategory, pageSize } })} // go to cart with state
       >

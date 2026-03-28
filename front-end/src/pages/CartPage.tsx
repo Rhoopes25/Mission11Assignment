@@ -11,8 +11,9 @@ function CartPage() {
 
   return (
     <div className="container mt-4">
-      <h1 className="mb-4">🛒 Your Cart</h1>
-
+        <h1 className="mb-4" style={{ color: "#0b3d91" }}>
+        Your Cart
+        </h1>
       {cart.length === 0 ? (
         <>
             <p className="text-muted">Your cart is empty!</p>

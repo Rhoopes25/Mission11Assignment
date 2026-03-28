@@ -13,7 +13,7 @@ function BookListPage() {
   const [sortBy, setSortBy] = useState<string>('title'); // sort field
   const [categories, setCategories] = useState<string[]>([]); // all categories for dropdown
   const [selectedCategory, setSelectedCategory] = useState<string>(''); // selected category
-  const [loading, setLoading] = useState<boolean>(false); // loading state for spinner
+  const [showToast, setShowToast] = useState<boolean>(false); // controls toast visibility
   const { addToCart } = useCart(); // pull addToCart from cart context
   const location = useLocation(); // read state coming back from cart page
 
@@ -36,7 +36,6 @@ function BookListPage() {
   // fetch books whenever page, size, sort, or category changes
   useEffect(() => {
     const categoryParam = selectedCategory ? `&category=${selectedCategory}` : ''; // only add if selected
-    setLoading(true); // show spinner while fetching
 
     fetch(
       `http://localhost:5000/api/books/allbooks?pageSize=${pageSize}&pageNum=${pageNum}&sortBy=${sortBy}${categoryParam}`
@@ -46,7 +45,6 @@ function BookListPage() {
         setBooks(data.books);
         setTotalItems(data.totalNumBooks);
         setTotalPages(Math.ceil(data.totalNumBooks / pageSize));
-        setLoading(false); // hide spinner when done
       });
   }, [pageSize, pageNum, sortBy, selectedCategory]); // re-fetch when any of these change
 
@@ -109,79 +107,83 @@ function BookListPage() {
           </div>
         </div>
 
-        {/* Spinner while loading - bootstrap spinner! */}
-        {loading ? (
-          <div className="text-center my-4">
-            <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </div>
-          </div>
-        ) : (
-          <>
-            {/* Book cards - one per book */}
-            <div className="row">
-              {books.map((book) => (
-                <div className="col-md-6 col-lg-4 mb-4" key={book.bookID}>
-                  <div className="card h-100 shadow-sm">
-                    <div className="card-body">
-                      <h5 className="card-title">{book.title}</h5>
-                      <h6 className="card-subtitle mb-2 text-muted">{book.author}</h6>
-                      <ul className="list-unstyled mt-2">
-                        <li><b>Publisher:</b> {book.publisher}</li>
-                        <li><b>ISBN:</b> {book.isbn}</li>
-                        <li><b>Classification:</b> {book.classification}</li>
-                        <li><b>Category:</b> {book.category}</li>
-                        <li><b>Pages:</b> {book.pageCount}</li>
-                        <li><b>Price:</b> ${book.price.toFixed(2)}</li>
-                      </ul>
-                      <button
-                        className="btn btn-primary btn-sm mt-2 w-100"
-                        onClick={() => {
-                          addToCart({ bookID: book.bookID, title: book.title, price: book.price, quantity: 1 }); // add to cart silently
-                        }}
-                      >
-                        Add to Cart
-                      </button>
-                    </div>
-                  </div>
+        {/* Book cards - one per book */}
+        <div className="row">
+          {books.map((book) => (
+            <div className="col-md-6 col-lg-4 mb-4" key={book.bookID}>
+              <div className="card h-100 shadow-sm">
+                <div className="card-body">
+                  <h5 className="card-title">{book.title}</h5>
+                  <h6 className="card-subtitle mb-2 text-muted">{book.author}</h6>
+                  <ul className="list-unstyled mt-2">
+                    <li><b>Publisher:</b> {book.publisher}</li>
+                    <li><b>ISBN:</b> {book.isbn}</li>
+                    <li><b>Classification:</b> {book.classification}</li>
+                    <li><b>Category:</b> {book.category}</li>
+                    <li><b>Pages:</b> {book.pageCount}</li>
+                    <li><b>Price:</b> ${book.price.toFixed(2)}</li>
+                  </ul>
+                  <button
+                    className="btn btn-primary btn-sm mt-2 w-100"
+                    onClick={() => {
+                      addToCart({ bookID: book.bookID, title: book.title, price: book.price, quantity: 1 }); // add to cart silently
+                      setShowToast(true); // show toast notification
+                      setTimeout(() => setShowToast(false), 2000); // hide after 2 seconds
+                    }}
+                  >
+                    Add to Cart
+                  </button>
                 </div>
-              ))}
+              </div>
             </div>
+          ))}
+        </div>
 
-            {/* Pagination buttons */}
-            <nav className="mt-3">
-              <ul className="pagination justify-content-center flex-wrap">
+        {/* Pagination buttons */}
+        <nav className="mt-3">
+          <ul className="pagination justify-content-center flex-wrap">
 
-                {/* Previous - disabled on page 1 */}
-                <li className={`page-item ${pageNum === 1 ? 'disabled' : ''}`}>
-                  <button className="page-link" onClick={() => setPageNum(pageNum - 1)}>Previous</button>
-                </li>
+            {/* Previous - disabled on page 1 */}
+            <li className={`page-item ${pageNum === 1 ? 'disabled' : ''}`}>
+              <button className="page-link" onClick={() => setPageNum(pageNum - 1)}>Previous</button>
+            </li>
 
-                {/* One button per page */}
-                {[...Array(totalPages)].map((_, index) => (
-                  <li key={index} className={`page-item ${pageNum === index + 1 ? 'active' : ''}`}>
-                    <button
-                      className="page-link"
-                      onClick={() => setPageNum(index + 1)}
-                      disabled={pageNum === index + 1}
-                    >
-                      {index + 1}
-                    </button>
-                  </li>
-                ))}
+            {/* One button per page */}
+            {[...Array(totalPages)].map((_, index) => (
+              <li key={index} className={`page-item ${pageNum === index + 1 ? 'active' : ''}`}>
+                <button
+                  className="page-link"
+                  onClick={() => setPageNum(index + 1)}
+                  disabled={pageNum === index + 1}
+                >
+                  {index + 1}
+                </button>
+              </li>
+            ))}
 
-                {/* Next - disabled on last page */}
-                <li className={`page-item ${pageNum === totalPages ? 'disabled' : ''}`}>
-                  <button className="page-link" onClick={() => setPageNum(pageNum + 1)}>Next</button>
-                </li>
-              </ul>
-            </nav>
+            {/* Next - disabled on last page */}
+            <li className={`page-item ${pageNum === totalPages ? 'disabled' : ''}`}>
+              <button className="page-link" onClick={() => setPageNum(pageNum + 1)}>Next</button>
+            </li>
+          </ul>
+        </nav>
 
-            <p className="text-center text-muted">
-              Showing page {pageNum} of {totalPages} ({totalItems} total books)
-            </p>
-          </>
-        )}
+        <p className="text-center text-muted">
+          Showing page {pageNum} of {totalPages} ({totalItems} total books)
+        </p>
+      </div>
+
+      {/* bootstrap toast - pops up when item added to cart */}
+      <div
+        className={`toast align-items-center text-white bg-success border-0 ${showToast ? 'show' : ''}`}
+        style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 1000 }}
+        role="alert"
+      >
+        <div className="d-flex">
+          <div className="toast-body">
+            ✅ Added to cart!
+          </div>
+        </div>
       </div>
     </>
   );
