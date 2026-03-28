@@ -1,9 +1,11 @@
 import { useCart } from '../context/CartContext'; // access the cart
-import { useNavigate } from 'react-router-dom'; // for continue shopping button
+import { useNavigate, useLocation } from 'react-router-dom'; // for navigation and reading state
 
 function CartPage() {
   const { cart, removeFromCart, clearCart, updateQuantity } = useCart(); // pull cart data and functions
   const navigate = useNavigate();
+  const location = useLocation(); // read state passed from book list
+  const { pageNum, selectedCategory, pageSize } = location.state || { pageNum: 1, selectedCategory: '', pageSize: 5 };
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0); // calculate grand total
 
@@ -12,8 +14,13 @@ function CartPage() {
       <h1 className="mb-4">🛒 Your Cart</h1>
 
       {cart.length === 0 ? (
-        <p className="text-muted">Your cart is empty!</p>
-      ) : (
+        <>
+            <p className="text-muted">Your cart is empty!</p>
+            <button className="btn btn-primary" onClick={() => navigate('/', { state: { pageNum, selectedCategory, pageSize } })}>
+            Continue Shopping
+            </button>
+        </>
+        ) : (
         <>
           <table className="table table-bordered">
             <thead className="table-dark">
@@ -68,7 +75,10 @@ function CartPage() {
           <div className="d-flex justify-content-between align-items-center mt-3">
             <h4>Total: ${total.toFixed(2)}</h4>
             <div className="d-flex gap-2">
-              <button className="btn btn-primary" onClick={() => navigate('/')}> {/* blue to stand out */}
+              <button
+                className="btn btn-primary"
+                onClick={() => navigate('/', { state: { pageNum, selectedCategory, pageSize } })}
+                >
                 Continue Shopping
               </button>
               <button className="btn btn-danger" onClick={clearCart}>

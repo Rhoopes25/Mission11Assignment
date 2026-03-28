@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { Book } from '../types/book';
 import { useCart } from '../context/CartContext'; // gives us access to the cart
-import { useNavigate } from 'react-router-dom'; // for navigating to cart with state
-
+import { useNavigate, useLocation } from 'react-router-dom'; // useLocation reads state coming back from cart
+import CartSummary from '../components/CartSummary'; // cart summary widget
 
 function BookListPage() {
   const [books, setBooks] = useState<Book[]>([]); // books from the API
@@ -15,7 +15,16 @@ function BookListPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>(''); // selected category
   const { addToCart } = useCart(); // pull addToCart from cart context
   const navigate = useNavigate();
+  const location = useLocation(); // read state coming back from cart page
 
+  // restore page, category, and page size if coming back from cart
+  useEffect(() => {
+    if (location.state) {
+      setPageNum(location.state.pageNum); // restore page
+      setSelectedCategory(location.state.selectedCategory); // restore category
+      setPageSize(location.state.pageSize); // restore page size
+    }
+  }, []); // only runs once on load
 
   // fetch categories once on load
   useEffect(() => {
@@ -41,7 +50,7 @@ function BookListPage() {
 
   return (
     <div className="container mt-4">
-      <h1 className="mb-4">📚 Bookstore</h1>
+<h1 className="mb-4" style={{ color: "#0b3d91" }}>Bookstore</h1>      <CartSummary pageNum={pageNum} selectedCategory={selectedCategory} pageSize={pageSize} />
 
       {/* Controls row - page size, sort, and category dropdowns */}
       <div className="d-flex gap-3 mb-4 align-items-center flex-wrap">
@@ -116,8 +125,7 @@ function BookListPage() {
                 <button
                   className="btn btn-primary btn-sm mt-2 w-100"
                   onClick={() => {
-                    addToCart({ bookID: book.bookID, title: book.title, price: book.price, quantity: 1 }); // add to cart
-                    navigate('/cart', { state: { pageNum, selectedCategory } }); // pass current page and category to cart
+                    addToCart({ bookID: book.bookID, title: book.title, price: book.price, quantity: 1 }); // add to cart silently
                   }}
                 >
                   Add to Cart
