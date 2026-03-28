@@ -19,27 +19,45 @@ public class BooksController : ControllerBase
     public IActionResult GetBooks(
         int pageSize = 5,
         int pageNum = 1,
-        string sortBy = "title")
+        string sortBy = "title",
+        string? category = null)
     {
         var query = _context.Books.AsQueryable();
 
-        // Sorting - currently sorts by title, can expand later
+        // Filter by category if one was provided
+        if (!string.IsNullOrEmpty(category))
+        {
+            query = query.Where(b => b.Category == category);
+        }
+
+        // Sorting
         query = sortBy.ToLower() switch
         {
             "title" => query.OrderBy(b => b.Title),
             _ => query.OrderBy(b => b.Title)
         };
 
-        // Get total count before pagination
+        // Total count AFTER filtering, BEFORE pagination
         var totalCount = query.Count();
 
-        // Apply pagination
+        // Pagination
         var books = query
             .Skip((pageNum - 1) * pageSize)
             .Take(pageSize)
             .ToList();
 
-        // Return both the books and total count in one object
         return Ok(new { books, totalNumBooks = totalCount });
+    }
+
+    [HttpGet("categories")]
+    public IActionResult GetCategories()
+    {
+        var categories = _context.Books
+            .Select(b => b.Category)
+            .Distinct()
+            .OrderBy(c => c)
+            .ToList();
+
+        return Ok(categories);
     }
 }
