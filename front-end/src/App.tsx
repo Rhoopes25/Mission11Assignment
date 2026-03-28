@@ -1,9 +1,9 @@
-// Import the BookList component 
-import BookList from './components/BookList';
+// Shows the BookListPage, but we'll add routing later for the cart page
+import BookListPage from './pages/BookListPage';
 
-// App is the root component - everything in the app flows through here
 function App() {
-  return <BookList />;
+// renders the main book list page
+  return <BookListPage />;
 }
 
 export default App;
