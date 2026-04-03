@@ -1,15 +1,17 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'; // handles navigation between pages
-import { CartProvider } from './context/CartContext'; // gives cart access to whole app
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { CartProvider } from './context/CartContext';
 import BookListPage from './pages/BookListPage';
-import CartPage from './pages/CartPage'; // import cart page
+import CartPage from './pages/CartPage';
+import AdminBooksPage from './pages/AdminBooksPage';
 
 function App() {
   return (
-    <CartProvider> {/* everything inside here can access the cart */}
-      <BrowserRouter> {/* enables page routing */}
-        <Routes> {/* container for all our routes */}
-          <Route path="/" element={<BookListPage />} /> {/* main page */}
-          <Route path="/cart" element={<CartPage />} /> {/* cart page */}
+    <CartProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<BookListPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/adminbooks" element={<AdminBooksPage />} />
         </Routes>
       </BrowserRouter>
     </CartProvider>
