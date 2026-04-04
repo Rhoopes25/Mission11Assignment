@@ -66,14 +66,14 @@ function AdminBooksPage() {
   }, []);
 
   function fetchBooks() {
-    fetch('http://localhost:5000/api/books/allbooks?pageSize=1000&pageNum=1')
+    fetch('https://bookstore-api-rachel.azurewebsites.net/api/books/allbooks?pageSize=1000&pageNum=1')
       .then((res) => res.json())
       .then((data) => setBooks(data.books));
   }
 
   function handleDelete(bookID: number) {
     if (!confirm('Delete this book?')) return;
-    fetch(`http://localhost:5000/api/books/deletebook/${bookID}`, {
+    fetch(`https://bookstore-api-rachel.azurewebsites.net/api/books/deletebook/${bookID}`, {
       method: 'DELETE',
     }).then(() => fetchBooks());
   }
@@ -95,7 +95,7 @@ function AdminBooksPage() {
 
   function handleUpdate() {
     if (!editingBook) return;
-    fetch(`http://localhost:5000/api/books/updatebook/${editingBook.bookID}`, {
+    fetch(`https://bookstore-api-rachel.azurewebsites.net/api/books/updatebook/${editingBook.bookID}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...formData, bookID: editingBook.bookID }),
@@ -107,7 +107,7 @@ function AdminBooksPage() {
   }
 
   function handleAdd() {
-    fetch('http://localhost:5000/api/books/addbook', {
+    fetch('https://bookstore-api-rachel.azurewebsites.net/api/books/addbook', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...formData, bookID: 0 }),

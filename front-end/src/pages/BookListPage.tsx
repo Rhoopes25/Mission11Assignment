@@ -28,7 +28,7 @@ function BookListPage() {
 
   // fetch categories once on load
   useEffect(() => {
-    fetch('http://localhost:5000/api/books/categories')
+    fetch('https://bookstore-api-rachel.azurewebsites.net/api/books/categories')
       .then((res) => res.json())
       .then((data) => setCategories(data));
   }, []);
@@ -38,7 +38,7 @@ function BookListPage() {
     const categoryParam = selectedCategory ? `&category=${selectedCategory}` : ''; // only add if selected
 
     fetch(
-      `http://localhost:5000/api/books/allbooks?pageSize=${pageSize}&pageNum=${pageNum}&sortBy=${sortBy}${categoryParam}`
+      `https://bookstore-api-rachel.azurewebsites.net/api/books/allbooks?pageSize=${pageSize}&pageNum=${pageNum}&sortBy=${sortBy}${categoryParam}`
     )
       .then((res) => res.json())
       .then((data) => {

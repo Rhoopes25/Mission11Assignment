@@ -25,11 +25,15 @@ builder.Services.AddDbContext<BookstoreDbContext>(options =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReact", policy =>
-        policy.WithOrigins("http://localhost:3000") // only allow requests from React's port
+        policy.WithOrigins(
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "https://witty-island-075340d0f.2.azurestaticapps.net",
+            "https://witty-island-075340d0f-preview.eastus2.2.azurestaticapps.net"
+        )
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
-
 // Builds the actual app from all the services we registered above
 var app = builder.Build();
 
